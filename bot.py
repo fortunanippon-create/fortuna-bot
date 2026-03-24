@@ -1,7 +1,25 @@
 import discord
 import random
 import os
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 
+# --- ダミーHTTPサーバー（Render対策） ---
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"OK")
+
+def run_server():
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(("0.0.0.0", port), Handler)
+    server.serve_forever()
+
+threading.Thread(target=run_server, daemon=True).start()
+# ----------------------------------------
+
+# Discord設定
 intents = discord.Intents.default()
 intents.members = True
 
@@ -19,4 +37,5 @@ async def on_member_join(member):
     except Exception as e:
         print("名前変更失敗", e)
 
-client.run(os.getenv["TOKEN"])
+# 環境変数からトークン取得
+client.run(os.environ["TOKEN"])
