@@ -1,32 +1,23 @@
 import discord
+import random
 import os
-import threading
-from http.server import HTTPServer, BaseHTTPRequestHandler
 
-# --- Render用ダミーサーバー ---
-class Handler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(200)
-        self.end_headers()
+intents = discord.Intents.default()
+intents.members = True
 
-    def do_HEAD(self):
-        self.send_response(200)
-        self.end_headers()
-
-def run_server():
-    port = int(os.environ.get("PORT", 10000))
-    server = HTTPServer(("0.0.0.0", port), Handler)
-    server.serve_forever()
-
-threading.Thread(target=run_server, daemon=True).start()
-# --------------------------------
-
-intents = discord.Intents.none()
 client = discord.Client(intents=intents)
 
 @client.event
 async def on_ready():
-    print("LOGIN SUCCESS:", client.user)
-    await client.close()
+    print(f"Bot起動: {client.user}")
+
+@client.event
+async def on_member_join(member):
+    new_name = "U-" + str(random.randint(1000, 9999))
+    try:
+        await member.edit(nick=new_name)
+        print(f"名前変更成功: {member} -> {new_name}")
+    except Exception as e:
+        print(f"名前変更失敗: {member} / {e}")
 
 client.run(os.environ["TOKEN"])
