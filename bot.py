@@ -16,7 +16,7 @@ async def on_ready():
 
 @client.event
 async def on_member_join(member):
-    new_name = "U-" + str(random.randint(1000, 9999))
+    new_name = "user" + str(member.id)[-6:]
     try:
         await member.edit(nick=new_name)
         print(f"名前変更成功: {member} -> {new_name}")
